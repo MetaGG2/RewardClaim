@@ -107,8 +107,6 @@ class RewardClaimGui(private val id: String) : WindowScreen() {
                 y = 72.percent()
             } childOf background
         }
-
-        adPopup(false)
     }
 
     //region Daily Streak
@@ -182,12 +180,6 @@ class RewardClaimGui(private val id: String) : WindowScreen() {
                                     state = State.SUCCESSFUL
                                     updateElements()
                                 }
-
-                                if (data.skippable || data.duration == 0) {
-                                    adPopup(true)
-                                } else {
-                                    schedule({ adPopup(true) }, data.duration.toLong(), TimeUnit.SECONDS)
-                                }
                             } else {
                                 state = State.FAILED_REWARDS
                                 errorPopup("Regex could not be found.\nUrl:${this.url}\nSecurity: ${securityMatcher != null}\nI18n: ${i18nMatcher != null}\nData: $${dataMatcher != null}")
@@ -201,7 +193,6 @@ class RewardClaimGui(private val id: String) : WindowScreen() {
                 }
             }
         )
-        adPopup(false)
     }
 
     private fun updateElements() {
@@ -283,41 +274,6 @@ class RewardClaimGui(private val id: String) : WindowScreen() {
                 }
             }
         }
-    }
-
-    private fun adPopup(skip: Boolean) {
-        Window.enqueueRenderOperation {
-            popup?.let {
-                if (it.parent.hasParent) {
-                    it.parent.removeChild(it)
-                    popup = null
-                }
-            }
-            popup = if (skip) {
-                UIPopup(
-                    "Reward Claim AD",
-                    "Hypixel is a great server and as such we don't want to remove their ad for their store. You can click the skip button when it appears to remove this message and claim your reward.",
-                    UIImage.ofResourceCached("/rewardclaim/external_link.png"),
-                    { UDesktop.browse(getAd()) },
-                    "${ChatColor.BOLD}Store",
-                    null,
-                    { removePopup() },
-                    "${ChatColor.BOLD}Skip"
-                ) childOf this.window
-            } else {
-                UIPopup(
-                    "Reward Claim AD",
-                    "Hypixel is a great server and as such we don't want to remove their ad for their store. You can click the skip button when it appears to remove this message and claim your reward.",
-                    UIImage.ofResourceCached("/rewardclaim/external_link.png"),
-                    { UDesktop.browse(getAd()) },
-                    "${ChatColor.BOLD}Store"
-                ) childOf this.window
-            }
-        }
-    }
-
-    private fun getAd(): URI {
-        return if (this::data.isInitialized) URI(data.adLink) else URI("https://store.hypixel.net/?utm_source=rewards-video&utm_medium=website&utm_content=TRsCiBNYY7M&utm_campaign=Rewardss")
     }
 
     override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
